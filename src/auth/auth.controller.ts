@@ -1,10 +1,11 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBody, ApiConflictResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConflictResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateAssistanteDto } from 'src/assistante/dto/create-assistante.dto';
 import { CreateParentDto } from 'src/parent/dto/create-parent.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 
+@ApiTags("Authentification")
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }

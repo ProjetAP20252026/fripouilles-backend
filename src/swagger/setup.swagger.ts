@@ -12,6 +12,7 @@ export async function setupSwagger(app: INestApplication, path: string) {
     const documentFactory = () => SwaggerModule.createDocument(app, config);
 
     SwaggerModule.setup(path, app, documentFactory, {
+        jsonDocumentUrl: `/${path}-json`,
         swaggerOptions: {
             persistAuthorization: true,
             docExpansion: 'list',

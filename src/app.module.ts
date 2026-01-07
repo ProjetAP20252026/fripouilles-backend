@@ -8,6 +8,7 @@ import { EnfantModule } from './enfant/enfant.module';
 import { ParentModule } from './parent/parent.module';
 import { PersonneAutoriseeModule } from './personne-autorisee/personne-autorisee.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { LienParentEnfantModule } from './lien-parent-enfant/lien-parent-enfant.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PrismaModule } from './prisma/prisma.module';
     AssistanteModule,
     EnfantModule,
     PersonneAutoriseeModule,
+    LienParentEnfantModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaModule, Logger],

@@ -1,10 +1,11 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
 import { CreatePersonneAutoriseeDto } from './dto/create-personne-autorisee.dto';
 import { UpdatePersonneAutoriseeDto } from './dto/update-personne-autorisee.dto';
 import { PersonneAutoriseeService } from './personne-autorisee.service';
 
+@ApiTags("Personne Autorisée")
 @Controller('personne-autorisee')
 export class PersonneAutoriseeController {
     constructor(private readonly personneAutoriseeService: PersonneAutoriseeService) { }
