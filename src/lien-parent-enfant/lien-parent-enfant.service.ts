@@ -111,7 +111,7 @@ export class LienParentEnfantService {
         const lien = await this.prisma.lienParentEnfant.update({
             where: { id },
             data: {
-                ...(updateLienDto.estResponsableLegal !== undefined && { estResponsableLegal: updateLienDto.estResponsableLegal }),
+                ...updateLienDto
             },
             include: {
                 parent: true,
