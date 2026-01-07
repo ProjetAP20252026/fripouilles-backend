@@ -1,0 +1,26 @@
+import { Logger, Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { AssistanteModule } from './assistante/assistante.module';
+import { AuthModule } from './auth/auth.module';
+import { EnfantModule } from './enfant/enfant.module';
+import { ParentModule } from './parent/parent.module';
+import { PersonneAutoriseeModule } from './personne-autorisee/personne-autorisee.module';
+import { PrismaModule } from './prisma/prisma.module';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot(
+      { isGlobal: true }
+    ),
+    AuthModule,
+    ParentModule,
+    AssistanteModule,
+    EnfantModule,
+    PersonneAutoriseeModule,
+  ],
+  controllers: [AppController],
+  providers: [AppService, PrismaModule, Logger],
+})
+export class AppModule { }

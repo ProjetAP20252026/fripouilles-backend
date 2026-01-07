@@ -1,0 +1,392 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  PARENT
+  ASSISTANTE_MATERNELLE
+}
+
+enum Sexe {
+  GARCON
+  FILLE
+}
+
+enum StatutContrat {
+  ACTIF
+  SUSPENDU
+  TERMINE
+}
+
+enum StatutValidation {
+  EN_ATTENTE
+  VALIDE
+  REFUSE
+}
+
+enum TypePublicAtelier {
+  ENFANT
+  PARENT_UNIQUEMENT
+  ASSISTANTE_UNIQUEMENT
+  MIXTE
+}
+
+enum TypeAccueilCreche {
+  REGULIER
+  OCCASIONNEL
+}
+
+enum StatutInscription {
+  ACTIVE
+  SUSPENDUE
+  TERMINEE
+}
+
+enum Humeur {
+  JOYEUX
+  CALME
+  FATIGUE
+  GRINCHEUX
+  MALADE
+}
+
+enum QualiteRepas {
+  TOUT_MANGE
+  MOITIE
+  PEU_MANGE
+  RIEN_MANGE
+}
+
+enum TypeSieste {
+  MATIN
+  APRES_MIDI
+  MATIN_ET_APRES_MIDI
+  AUCUNE
+}
+
+enum TypeActionModification {
+  AJOUT
+  MODIFICATION
+  SUPPRESSION
+}
+
+model Utilisateur {
+  id               Int               @id @default(autoincrement())
+  nom              String
+  prenom           String
+  telephone        String
+  email            String            @unique
+  password         String
+  role             Role
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  parentProfil     ParentProfil?
+  assistanteProfil AssistanteProfil?
+
+  @@map("utilisateur")
+}
+
+model ParentProfil {
+  id                     Int                      @id @default(autoincrement())
+  utilisateurId          Int                      @unique
+  utilisateur            Utilisateur              @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  adresse                String
+  codePostal             String
+  ville                  String
+  situationFamiliale     String
+  profession             String?
+  employeur              String?
+  numeroAllocataire      String?
+  beneficiaireCAF        Boolean                  @default(false)
+  numeroCAF              String?
+  contactUrgenceNom      String
+  contactUrgenceTel      String
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  liensEnfants           LienParentEnfant[]
+  contratsGarde          ContratGarde[]
+  historiqueModification HistoriqueModification[]
+  inscriptionsAtelier    InscriptionAtelier[]
+  inscriptionsCreche     InscriptionCreche[]
+  reservationsCreche     ReservationCreche[]
+
+  @@map("parent_profil")
+}
+
+model AssistanteProfil {
+  id                    Int                     @id @default(autoincrement())
+  utilisateurId         Int                     @unique
+  utilisateur           Utilisateur             @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  numeroAgrement        String                  @unique
+  dateObtentionAgrement DateTime
+  agrementValide        Boolean
+  dateFinAgrement       DateTime?
+  capaciteAccueil       Int
+  adresse               String
+  codePostal            String
+  ville                 String
+  experience            Int
+  disponibilites        String                  @db.Text
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  contratsGarde         ContratGarde[]
+  suivisGarde           SuiviGardeAssistante[]
+  ateliers              Atelier[]               @relation("AtelierAnimateur")
+  suivisJournalier      SuiviJournalierEnfant[]
+
+  @@map("assistante_profil")
+}
+
+model Enfant {
+  id                  Int                     @id @default(autoincrement())
+  nom                 String
+  prenom              String
+  dateNaissance       DateTime
+  sexe                Sexe
+  allergies           String?                 @db.Text
+  remarquesMedicales  String?                 @db.Text
+  medecinTraitant     String?
+  medecinTraitantTel  String?
+  createdAt           DateTime                @default(now())
+  updatedAt           DateTime                @updatedAt
+  liensParents        LienParentEnfant[]
+  personnesAutorisees PersonneAutorisee[]
+  contratsGarde       ContratGarde[]
+  inscriptionsAtelier InscriptionAtelier[]
+  inscriptionCreche   InscriptionCreche?
+  reservationsCreche  ReservationCreche[]
+  suivisJournalier    SuiviJournalierEnfant[]
+
+  @@map("enfant")
+}
+
+model LienParentEnfant {
+  id                  Int          @id @default(autoincrement())
+  parentId            Int
+  parent              ParentProfil @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  enfantId            Int
+  enfant              Enfant       @relation(fields: [enfantId], references: [id], onDelete: Cascade)
+  estResponsableLegal Boolean      @default(true)
+
+  @@unique([parentId, enfantId])
+  @@map("relation_parent_enfant")
+}
+
+model PersonneAutorisee {
+  id                 Int      @id @default(autoincrement())
+  enfantId           Int
+  enfant             Enfant   @relation(fields: [enfantId], references: [id], onDelete: Cascade)
+  nom                String
+  prenom             String
+  telephone          String
+  lienAvecEnfant     String
+  autorisationEcrite Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("personne_autorisee")
+}
+
+model ContratGarde {
+  id                  Int              @id @default(autoincrement())
+  enfantId            Int
+  enfant              Enfant           @relation(fields: [enfantId], references: [id])
+  assistanteId        Int
+  assistante          AssistanteProfil @relation(fields: [assistanteId], references: [id])
+  parentId            Int
+  parent              ParentProfil     @relation(fields: [parentId], references: [id])
+  dateDebut           DateTime
+  dateFin             DateTime?
+  statutContrat       StatutContrat
+  tarifHoraireBrut    Float
+  nombreHeuresSemaine Float
+  indemniteEntretien  Float
+  indemniteRepas      Float
+  indemniteKm         Float?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+  paies               Paie[]
+
+  @@unique([enfantId, assistanteId, parentId])
+  @@map("contrat_garde")
+}
+
+model SuiviGardeAssistante {
+  id                  Int              @id @default(autoincrement())
+  assistanteId        Int
+  assistante          AssistanteProfil @relation(fields: [assistanteId], references: [id])
+  date                DateTime
+  heureArriveeReelle  DateTime?
+  heureDepartReelle   DateTime?
+  repasFournis        Int              @default(0)
+  fraisDivers         Float?
+  kilometresParcourus Float?
+  nombreEnfantsGarde  Int
+  statutValidation    StatutValidation @default(EN_ATTENTE)
+  dateValidation      DateTime?
+  commentaireParent   String?          @db.Text
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime         @updatedAt
+
+  @@unique([assistanteId, date])
+  @@map("suivi_garde_assistante")
+}
+
+model Paie {
+  id                        Int          @id @default(autoincrement())
+  contratGardeId            Int
+  contratGarde              ContratGarde @relation(fields: [contratGardeId], references: [id])
+  mois                      Int
+  annee                     Int
+  nombreHeuresNormales      Float
+  nombreHeuresMajorees      Float
+  nombreJoursPresence       Int
+  nombreRepas               Int
+  montantIndemniteEntretien Float
+  montantIndemniteRepas     Float
+  montantIndemniteKm        Float        @default(0)
+  salaireBrutBase           Float
+  salaireNetAPayer          Float
+  chargesPatronales         Float
+  chargesSalariales         Float
+  dateEdition               DateTime     @default(now())
+  commentaire               String?      @db.Text
+
+  @@unique([contratGardeId, mois, annee])
+  @@map("paie")
+}
+
+model SuiviJournalierEnfant {
+  id                     Int                      @id @default(autoincrement())
+  enfantId               Int
+  enfant                 Enfant                   @relation(fields: [enfantId], references: [id])
+  assistanteId           Int
+  assistante             AssistanteProfil         @relation(fields: [assistanteId], references: [id])
+  date                   DateTime
+  temperature            Float?
+  humeur                 Humeur?
+  qualiteSommeil         String?
+  siesteFaites           TypeSieste?
+  appetit                QualiteRepas?
+  contenuRepas           String?                  @db.Text
+  biberons               String?
+  change                 Boolean                  @default(true)
+  selles                 Boolean                  @default(false)
+  soins                  String?                  @db.Text
+  activites              String?                  @db.Text
+  remarques              String?                  @db.Text
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  historiqueModification HistoriqueModification[]
+
+  @@unique([enfantId, assistanteId, date])
+  @@map("suivi_journalier_enfant")
+}
+
+model HistoriqueModification {
+  id          Int                    @id @default(autoincrement())
+  parentId    Int
+  parent      ParentProfil           @relation(fields: [parentId], references: [id])
+  suiviId     Int
+  suivi       SuiviJournalierEnfant  @relation(fields: [suiviId], references: [id])
+  dateAction  DateTime               @default(now())
+  commentaire String?
+  typeAction  TypeActionModification
+
+  @@map("historique_modification")
+}
+
+model Atelier {
+  id                    Int                  @id @default(autoincrement())
+  nom                   String
+  description           String?              @db.Text
+  date                  DateTime
+  heureDebut            DateTime
+  heureFin              DateTime
+  nombrePlaces          Int
+  lieu                  String
+  typePublic            TypePublicAtelier
+  ageMinMois            Int?
+  ageMaxMois            Int?
+  animateurId           Int?
+  animateur             AssistanteProfil?    @relation("AtelierAnimateur", fields: [animateurId], references: [id])
+  dateLimiteInscription DateTime
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  inscriptions          InscriptionAtelier[]
+
+  @@map("atelier")
+}
+
+model InscriptionAtelier {
+  id              Int           @id @default(autoincrement())
+  atelierId       Int
+  atelier         Atelier       @relation(fields: [atelierId], references: [id])
+  parentId        Int?
+  parent          ParentProfil? @relation(fields: [parentId], references: [id])
+  enfantId        Int?
+  enfant          Enfant?       @relation(fields: [enfantId], references: [id])
+  dateInscription DateTime      @default(now())
+  present         Boolean       @default(false)
+
+  @@map("inscription_atelier")
+}
+
+model CrechePlanning {
+  id             Int      @id @default(autoincrement())
+  jourSemaine    Int
+  heureOuverture DateTime
+  heureFermeture DateTime
+  tarifHoraire   Float
+  capaciteMax    Int
+
+  @@map("parametrage_creche")
+}
+
+model InscriptionCreche {
+  id            Int               @id @default(autoincrement())
+  enfantId      Int               @unique
+  enfant        Enfant            @relation(fields: [enfantId], references: [id])
+  parentId      Int
+  parent        ParentProfil      @relation(fields: [parentId], references: [id])
+  typeAccueil   TypeAccueilCreche
+  joursReserves String?
+  dateDebut     DateTime
+  dateFin       DateTime?
+  statutDossier StatutInscription @default(ACTIVE)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  @@map("dossier_inscription_creche")
+}
+
+model ReservationCreche {
+  id              Int              @id @default(autoincrement())
+  enfantId        Int
+  enfant          Enfant           @relation(fields: [enfantId], references: [id])
+  parentId        Int
+  parent          ParentProfil     @relation(fields: [parentId], references: [id])
+  dateReservation DateTime
+  heureArrivee    DateTime
+  heureDepart     DateTime
+  statut          StatutValidation @default(EN_ATTENTE)
+  facture         Boolean          @default(false)
+  montant         Float?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@map("reservation_creche")
+}
