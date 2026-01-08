@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { CreatePersonneAutoriseeDto } from './dto/create-personne-autorisee.dto';
 import { UpdatePersonneAutoriseeDto } from './dto/update-personne-autorisee.dto';
 import { PersonneAutoriseeService } from './personne-autorisee.service';

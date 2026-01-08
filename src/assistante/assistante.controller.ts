@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/decorators/user.decorator';
 import { AssistanteService } from './assistante.service';
 import { UpdateAssistanteDto } from './dto/update-assistante.dto';
@@ -38,7 +38,7 @@ export class AssistanteController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Put(":id")
+    @Put()
     @ApiOperation({ summary: 'Mettre à jour le profil de l\'assistante' })
     @ApiOkResponse({
         description: 'Profil assistante mis à jour avec succès',
@@ -49,7 +49,7 @@ export class AssistanteController {
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Assistante non trouvée' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async updateProfile(@Param("id") userId: number, @Body() updateAssistanteDto: UpdateAssistanteDto) {
+    async updateProfile(@User('sub') userId: number, @Body() updateAssistanteDto: UpdateAssistanteDto) {
         return this.assistanteService.updateProfile(userId, updateAssistanteDto);
     }
 }

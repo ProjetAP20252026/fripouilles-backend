@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/decorators/user.decorator';
 import { UpdateParentDto } from './dto/update-parent.dto';
 import { ParentService } from './parent.service';
@@ -39,7 +39,7 @@ export class ParentController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Put(":id")
+    @Put()
     @ApiOperation({ summary: 'Mettre à jour le profil du parent' })
     @ApiOkResponse({
         description: 'Profil parent mis à jour avec succès',
@@ -50,7 +50,7 @@ export class ParentController {
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Parent non trouvé' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async updateProfile(@Param("id") userId: number, @Body() updateParentDto: UpdateParentDto) {
+    async updateProfile(@User('sub') userId: number, @Body() updateParentDto: UpdateParentDto) {
         return this.parentService.updateProfile(userId, updateParentDto);
     }
 }

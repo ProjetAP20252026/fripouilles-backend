@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { NotAssistanteGuard } from 'src/auth/guards/not-assistante.guard';
 import { CreateEnfantDto } from './dto/create-enfant.dto';
 import { UpdateEnfantDto } from './dto/update-enfant.dto';
 import { EnfantService } from './enfant.service';
@@ -9,7 +10,7 @@ import { EnfantService } from './enfant.service';
 export class EnfantController {
     constructor(private readonly enfantService: EnfantService) { }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, NotAssistanteGuard)
     @Post()
     @ApiOperation({ summary: 'Créer un nouvel enfant' })
     @ApiCreatedResponse({
@@ -33,6 +34,7 @@ export class EnfantController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    @ApiForbiddenResponse({ description: 'Les assistantes maternelles ne peuvent pas créer d\'enfants' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
     async create(@Body() createEnfantDto: CreateEnfantDto) {
         return this.enfantService.create(createEnfantDto);

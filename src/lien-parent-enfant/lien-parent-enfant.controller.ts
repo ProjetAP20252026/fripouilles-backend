@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { NotAssistanteGuard } from 'src/auth/guards/not-assistante.guard';
 import { CreateLienParentEnfantDto } from './dto/create-lien-parent-enfant.dto';
 import { UpdateLienParentEnfantDto } from './dto/update-lien-parent-enfant.dto';
 import { LienParentEnfantService } from './lien-parent-enfant.service';
@@ -10,7 +11,7 @@ import { LienParentEnfantService } from './lien-parent-enfant.service';
 export class LienParentEnfantController {
     constructor(private readonly lienParentEnfantService: LienParentEnfantService) { }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, NotAssistanteGuard)
     @Post('lien')
     @ApiOperation({ summary: 'Créer un lien entre un parent et un enfant' })
     @ApiCreatedResponse({
@@ -36,6 +37,7 @@ export class LienParentEnfantController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    @ApiForbiddenResponse({ description: 'Les assistantes maternelles ne peuvent pas créer de liens parent-enfant' })
     @ApiNotFoundResponse({ description: 'Parent ou enfant non trouvé' })
     @ApiConflictResponse({ description: 'Un lien existe déjà entre ce parent et cet enfant' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
