@@ -1,61 +1,192 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Backend - RAM Les Fripouilles
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API Backend pour le Relais d'Assistantes Maternelles "Les Fripouilles" - Projet BTS SIO 2025-2026
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Description
 
-## Description
+Ce projet est une API REST développée avec NestJS et Prisma pour gérer l'ensemble des services du RAM Les Fripouilles :
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Inscription et gestion des utilisateurs (Parents, Assistantes Maternelles, Admin)
+- Gestion des enfants et liens parent-enfant
+- Personnes autorisées à récupérer les enfants
+- Contrats de garde et rémunération des assistantes maternelles
+- Ateliers d'éveil
+- Service de crèche (accueil régulier et occasionnel)
+- Suivi journalier des enfants
 
-## Project setup
+## 🚀 Technologies utilisées
+
+- **NestJS** - Framework Node.js
+- **Prisma** - ORM pour PostgreSQL
+- **PostgreSQL** - Base de données
+- **JWT** - Authentification
+- **Swagger** - Documentation API
+- **TypeScript** - Langage de développement
+
+## 📦 Installation
 
 ```bash
-$ npm install
+npm install
 ```
 
-## Compile and run the project
+## ⚙️ Configuration
 
-```bash
-# development
-$ npm run start
+Créer un fichier `.env` à la racine :
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/fripouilles"
+JWT_SECRET="votre_secret_jwt_très_sécurisé"
+APP_PORT=3000
 ```
 
-## Run tests
+## 🗄️ Base de données
 
 ```bash
-# unit tests
+# Générer le client Prisma
+npx prisma generate
+
+# Appliquer les migrations
+npx prisma migrate dev
+
+# Ouvrir Prisma Studio
+npx prisma studio
+```
+
+## 🏃 Démarrage
+
+```bash
+# Mode développement
+npm run start:dev
+
+# Mode production
+npm run start:prod
+```
+
+L'API sera accessible sur `http://localhost:3000/api`
+La documentation Swagger sur `http://localhost:3000/api/doc`
+
+## 📚 Structure du projet
+
+```
+src/
+├── auth/               # Authentification JWT + Guards
+├── assistante/         # Module Assistantes Maternelles
+├── parent/            # Module Parents
+├── enfant/            # Module Enfants
+├── lien-parent-enfant/ # Module Liens Parent-Enfant
+├── personne-autorisee/ # Module Personnes Autorisées
+├── decorators/        # Décorateurs personnalisés (User, Roles)
+├── common/            # Pipes et utilitaires communs
+├── prisma/            # Service Prisma
+└── swagger/           # Configuration Swagger
+```
+
+## 🔐 Authentification
+
+L'API utilise JWT pour l'authentification. Trois rôles sont disponibles :
+
+- `ADMIN` - Accès complet
+- `PARENT` - Gestion de ses enfants et inscriptions
+- `ASSISTANTE_MATERNELLE` - Suivi des enfants gardés
+
+### Endpoints d'authentification
+
+```
+POST /api/auth/register/parent      # Inscription parent
+POST /api/auth/register/assistante  # Inscription assistante
+POST /api/auth/login                # Connexion
+```
+
+## 📖 Modules implémentés
+
+### ✅ Modules complétés
+
+1. **Authentification** (`/api/auth`)
+   - Inscription (parents et assistantes)
+   - Connexion avec JWT
+   - Guards : JwtAuthGuard, RolesGuard, NotAssistanteGuard
+
+2. **Parents** (`/api/parent`)
+   - GET `/` - Profil du parent connecté
+   - GET `/tous` - Liste tous les parents (Admin)
+   - PUT `/` - Mise à jour du profil
+
+3. **Assistantes** (`/api/assistante`)
+   - GET `/` - Profil de l'assistante connectée
+   - GET `/toutes` - Liste toutes les assistantes
+   - PUT `/` - Mise à jour du profil
+
+4. **Enfants** (`/api/enfant`)
+   - POST `/` - Créer un enfant (interdit aux assistantes)
+   - GET `/` - Liste des enfants (avec filtre parentId optionnel)
+   - GET `/mes-enfants` - Enfants du parent connecté
+   - GET `/:id` - Détails d'un enfant
+   - PUT `/:id` - Modifier un enfant
+   - DELETE `/:id` - Supprimer un enfant
+
+5. **Liens Parent-Enfant** (`/api/lien-parent-enfant`)
+   - POST `/lien` - Créer un lien (interdit aux assistantes)
+   - GET `/lien` - Liste des liens (avec filtres)
+   - GET `/lien/:id` - Détails d'un lien
+   - PUT `/lien/:id` - Modifier un lien
+   - DELETE `/lien/:id` - Supprimer un lien
+
+6. **Personnes Autorisées** (`/api/personne-autorisee`)
+   - CRUD complet pour les personnes autorisées à récupérer les enfants
+
+### 🔜 Modules à implémenter
+
+Les schémas de base de données sont prêts, il reste à créer les controllers/services :
+
+- **Contrats de garde** (`ContratGarde`, `SuiviGardeAssistante`)
+- **Paie** (`Paie`)
+- **Ateliers** (`Atelier`, `InscriptionAtelier`)
+- **Crèche** (`InscriptionCreche`, `ReservationCreche`, `CrechePlanning`)
+- **Suivi journalier** (`SuiviJournalierEnfant`)
+
+## 🛡️ Sécurité
+
+- Validation automatique des DTOs avec `class-validator`
+- Guards personnalisés pour contrôler l'accès par rôle
+- Mots de passe hashés avec bcrypt
+- Tokens JWT avec expiration
+
+## 🔧 Améliorations récentes
+
+✅ Utilisation de `ParseIntPipe` et `ParseOptionalIntPipe` pour valider les paramètres  
+✅ Décorateur `@User` pour récupérer l'utilisateur connecté  
+✅ Décorateur `@Roles` pour contrôler l'accès par rôle  
+✅ Guards réutilisables (`RolesGuard`, `NotAssistanteGuard`)  
+✅ Endpoints contextuels (ex: `/mes-enfants` pour les parents)  
+✅ Documentation Swagger complète avec ApiTags
+
+## 📝 TODO
+
+- [ ] Implémenter les modules manquants (Ateliers, Crèche, Paie, etc.)
+- [ ] Ajouter des tests unitaires et e2e
+- [ ] Implémenter la pagination pour les listes
+- [ ] Ajouter un système de notification
+- [ ] Créer des rapports et statistiques
+
+## 👥 Équipe
+
+Projet BTS SIO 2025-2026 - Atelier de Professionnalisation
+
+---
+
+Pour plus d'informations, consultez le [contexte du projet](./contexte.md)
+
 $ npm run test
 
 # e2e tests
+
 $ npm run test:e2e
 
 # test coverage
+
 $ npm run test:cov
-```
+
+````
 
 ## Deployment
 
@@ -66,7 +197,7 @@ If you are looking for a cloud-based platform to deploy your NestJS application,
 ```bash
 $ npm install -g @nestjs/mau
 $ mau deploy
-```
+````
 
 With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
 

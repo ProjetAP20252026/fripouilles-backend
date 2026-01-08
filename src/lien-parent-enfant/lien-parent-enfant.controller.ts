@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { NotAssistanteGuard } from 'src/auth/guards/not-assistante.guard';
+import { ParseOptionalIntPipe } from 'src/common/pipes/parse-optional-int.pipe';
 import { CreateLienParentEnfantDto } from './dto/create-lien-parent-enfant.dto';
 import { UpdateLienParentEnfantDto } from './dto/update-lien-parent-enfant.dto';
 import { LienParentEnfantService } from './lien-parent-enfant.service';
@@ -72,11 +73,11 @@ export class LienParentEnfantController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
-    async findAllLiens(@Query('enfantId') enfantId?: string, @Query('parentId') parentId?: string) {
-        return this.lienParentEnfantService.findAllLiens(
-            enfantId ? parseInt(enfantId) : undefined,
-            parentId ? parseInt(parentId) : undefined
-        );
+    async findAllLiens(
+        @Query('enfantId', ParseOptionalIntPipe) enfantId?: number,
+        @Query('parentId', ParseOptionalIntPipe) parentId?: number
+    ) {
+        return this.lienParentEnfantService.findAllLiens(enfantId, parentId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -105,8 +106,8 @@ export class LienParentEnfantController {
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Lien parent-enfant non trouvé' })
-    async findOneLien(@Param('id') id: string) {
-        return this.lienParentEnfantService.findOneLien(parseInt(id));
+    async findOneLien(@Param('id', ParseIntPipe) id: number) {
+        return this.lienParentEnfantService.findOneLien(id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -137,8 +138,8 @@ export class LienParentEnfantController {
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Lien parent-enfant non trouvé' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async updateLien(@Param('id') id: string, @Body() updateLienDto: UpdateLienParentEnfantDto) {
-        return this.lienParentEnfantService.updateLien(parseInt(id), updateLienDto);
+    async updateLien(@Param('id', ParseIntPipe) id: number, @Body() updateLienDto: UpdateLienParentEnfantDto) {
+        return this.lienParentEnfantService.updateLien(id, updateLienDto);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -152,7 +153,7 @@ export class LienParentEnfantController {
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Lien parent-enfant non trouvé' })
-    async removeLien(@Param('id') id: string) {
-        return this.lienParentEnfantService.removeLien(parseInt(id));
+    async removeLien(@Param('id', ParseIntPipe) id: number) {
+        return this.lienParentEnfantService.removeLien(id);
     }
 }

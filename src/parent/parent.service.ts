@@ -124,4 +124,44 @@ export class ParentService {
             message: 'Profil parent mis à jour avec succès',
         }
     }
+
+    async findAll() {
+        const parents = await this.prisma.utilisateur.findMany({
+            where: { role: Role.PARENT },
+            select: {
+                id: true,
+                nom: true,
+                prenom: true,
+                email: true,
+                telephone: true,
+                role: true,
+                createdAt: true,
+                parentProfil: {
+                    select: {
+                        id: true,
+                        adresse: true,
+                        codePostal: true,
+                        ville: true,
+                        situationFamiliale: true,
+                        profession: true,
+                        beneficiaireCAF: true,
+                        liensEnfants: {
+                            include: {
+                                enfant: {
+                                    select: {
+                                        id: true,
+                                        nom: true,
+                                        prenom: true,
+                                        dateNaissance: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        return parents;
+    }
 }
