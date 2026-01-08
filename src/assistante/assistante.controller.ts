@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Role } from 'generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RoleGuard } from 'src/auth/guards/role.guard';
 import { User } from 'src/decorators/user.decorator';
 import { AssistanteService } from './assistante.service';
 import { UpdateAssistanteDto } from './dto/update-assistante.dto';
@@ -10,7 +12,7 @@ import { UpdateAssistanteDto } from './dto/update-assistante.dto';
 export class AssistanteController {
     constructor(private readonly assistanteService: AssistanteService) { }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.ASSISTANTE_MATERNELLE))
     @Get()
     @ApiOperation({ summary: 'Récupérer le profil de l\'assistante connectée' })
     @ApiOkResponse({
@@ -33,8 +35,9 @@ export class AssistanteController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    @ApiForbiddenResponse({ description: 'Accès réservé aux assistantes' })
     @ApiNotFoundResponse({ description: 'Assistante non trouvée' })
-    async fetchProfile(@User('sub') userId: number) {
+    async fetchProfile(@User('userId') userId: number) {
         return this.assistanteService.fetchProfil(userId);
     }
 
@@ -65,7 +68,7 @@ export class AssistanteController {
         return this.assistanteService.findAll();
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.ASSISTANTE_MATERNELLE))
     @Put()
     @ApiOperation({ summary: 'Mettre à jour le profil de l\'assistante' })
     @ApiOkResponse({
@@ -75,9 +78,10 @@ export class AssistanteController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    @ApiForbiddenResponse({ description: 'Accès réservé aux assistantes' })
     @ApiNotFoundResponse({ description: 'Assistante non trouvée' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async updateProfile(@User('sub') userId: number, @Body() updateAssistanteDto: UpdateAssistanteDto) {
+    async updateProfile(@User('userId') userId: number, @Body() updateAssistanteDto: UpdateAssistanteDto) {
         return this.assistanteService.updateProfile(userId, updateAssistanteDto);
     }
 }

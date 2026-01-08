@@ -2,8 +2,7 @@ import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Role } from 'generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Roles } from 'src/decorators/roles.decorator';
+import { RoleGuard } from 'src/auth/guards/role.guard';
 import { User } from 'src/decorators/user.decorator';
 import { UpdateParentDto } from './dto/update-parent.dto';
 import { ParentService } from './parent.service';
@@ -13,7 +12,7 @@ import { ParentService } from './parent.service';
 export class ParentController {
     constructor(private readonly parentService: ParentService) { }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.PARENT))
     @Get()
     @ApiOperation({ summary: 'Récupérer le profil du parent connecté' })
     @ApiOkResponse({
@@ -37,13 +36,13 @@ export class ParentController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    @ApiForbiddenResponse({ description: 'Accès réservé aux parents' })
     @ApiNotFoundResponse({ description: 'Profil parent non trouvé' })
-    async fetchProfile(@User('sub') userId: number) {
+    async fetchProfile(@User('userId') userId: number) {
         return this.parentService.fetchProfil(userId);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.ADMIN))
     @Get('tous')
     @ApiOperation({ summary: 'Récupérer tous les parents (Admin uniquement)' })
     @ApiOkResponse({
@@ -69,7 +68,7 @@ export class ParentController {
         return this.parentService.findAll();
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.PARENT))
     @Put()
     @ApiOperation({ summary: 'Mettre à jour le profil du parent' })
     @ApiOkResponse({
@@ -79,9 +78,10 @@ export class ParentController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    @ApiForbiddenResponse({ description: 'Accès réservé aux parents' })
     @ApiNotFoundResponse({ description: 'Parent non trouvé' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async updateProfile(@User('sub') userId: number, @Body() updateParentDto: UpdateParentDto) {
+    async updateProfile(@User('userId') userId: number, @Body() updateParentDto: UpdateParentDto) {
         return this.parentService.updateProfile(userId, updateParentDto);
     }
 }

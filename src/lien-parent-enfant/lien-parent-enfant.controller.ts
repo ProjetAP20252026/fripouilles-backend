@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiConflictResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Role } from 'generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { NotAssistanteGuard } from 'src/auth/guards/not-assistante.guard';
+import { RoleGuard } from 'src/auth/guards/role.guard';
 import { ParseOptionalIntPipe } from 'src/common/pipes/parse-optional-int.pipe';
 import { CreateLienParentEnfantDto } from './dto/create-lien-parent-enfant.dto';
 import { UpdateLienParentEnfantDto } from './dto/update-lien-parent-enfant.dto';
@@ -12,7 +13,7 @@ import { LienParentEnfantService } from './lien-parent-enfant.service';
 export class LienParentEnfantController {
     constructor(private readonly lienParentEnfantService: LienParentEnfantService) { }
 
-    @UseGuards(JwtAuthGuard, NotAssistanteGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.PARENT, Role.ADMIN))
     @Post('lien')
     @ApiOperation({ summary: 'Créer un lien entre un parent et un enfant' })
     @ApiCreatedResponse({

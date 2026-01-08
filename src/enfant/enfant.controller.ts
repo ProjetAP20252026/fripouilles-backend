@@ -1,7 +1,8 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Role } from 'generated/prisma/enums';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { NotAssistanteGuard } from 'src/auth/guards/not-assistante.guard';
+import { RoleGuard } from 'src/auth/guards/role.guard';
 import { ParseOptionalIntPipe } from 'src/common/pipes/parse-optional-int.pipe';
 import { User } from 'src/decorators/user.decorator';
 import { CreateEnfantDto } from './dto/create-enfant.dto';
@@ -13,7 +14,7 @@ import { EnfantService } from './enfant.service';
 export class EnfantController {
     constructor(private readonly enfantService: EnfantService) { }
 
-    @UseGuards(JwtAuthGuard, NotAssistanteGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.PARENT, Role.ADMIN))
     @Post()
     @ApiOperation({ summary: 'Créer un nouvel enfant' })
     @ApiCreatedResponse({
@@ -92,7 +93,7 @@ export class EnfantController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
-    async findMyChildren(@User('sub') userId: number) {
+    async findMyChildren(@User('userId') userId: number) {
         return this.enfantService.findByParentUserId(userId);
     }
 

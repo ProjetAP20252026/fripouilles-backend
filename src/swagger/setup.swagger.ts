@@ -6,7 +6,10 @@ export async function setupSwagger(app: INestApplication, path: string) {
         .setTitle('Fripouilles API')
         .setDescription("API du projet d'AP - Les Fripouilles")
         .setVersion('1.0.0')
-        .addBearerAuth()
+        .addBearerAuth({
+            type: 'http',
+            scheme: 'bearer',
+        })
         .build();
 
     const documentFactory = () => SwaggerModule.createDocument(app, config);
