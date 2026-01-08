@@ -9,7 +9,11 @@ export async function setupSwagger(app: INestApplication, path: string) {
         .addBearerAuth({
             type: 'http',
             scheme: 'bearer',
-        })
+            bearerFormat: 'JWT',
+            in: 'header',
+            name: 'Authorization',
+        }, 'bearer')
+        .addSecurityRequirements('bearer')
         .build();
 
     const documentFactory = () => SwaggerModule.createDocument(app, config);
