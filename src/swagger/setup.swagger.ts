@@ -12,12 +12,15 @@ export async function setupSwagger(app: INestApplication, path: string) {
     const documentFactory = () => SwaggerModule.createDocument(app, config);
 
     SwaggerModule.setup(path, app, documentFactory, {
-        jsonDocumentUrl: `/${path}-json`,
+        jsonDocumentUrl: `/${path}/json`,
         swaggerOptions: {
             persistAuthorization: true,
             docExpansion: 'list',
             filter: true,
             showRequestDuration: true,
+            urls: [
+                { url: `/${path}/json`, name: 'JSON' },
+            ],
         },
         customSiteTitle: "Fripouilles API Documentation",
     });

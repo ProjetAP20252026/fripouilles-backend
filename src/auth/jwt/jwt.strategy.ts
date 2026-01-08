@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { Role } from 'generated/prisma/enums';
@@ -16,11 +16,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             ignoreExpiration: false,
-            secretOrKey: configService.get('JWT_SECRET') as string,
+            secretOrKey: configService.getOrThrow<string>('JWT_SECRET'),
         });
     }
 
     async validate(payload: JwtPayload) {
+        if (!payload.sub || !payload.email || !payload.role) {
+            throw new UnauthorizedException('Invalid token payload');
+        }
         return {
             userId: payload.sub,
             email: payload.email,

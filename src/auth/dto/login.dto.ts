@@ -17,12 +17,12 @@ export class LoginDto {
     @IsNotEmpty()
     @IsStrongPassword(
         {
-            minLength: 12,
+            minLength: 10,
             minNumbers: 1,
             minSymbols: 1
         },
         {
-            message: 'Le mot de passe doit contenir au moins 12 caractères, un chiffre et un symbole.'
+            message: 'Le mot de passe doit contenir au moins 10 caractères, un chiffre et un symbole.'
         }
     )
     readonly password: string;
