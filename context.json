@@ -1,0 +1,1604 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/": {
+      "get": {
+        "operationId": "AppController_getHello",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Retourne un message de bienvenue et un lien vers la documentation de l'API.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Bienvenue sur l'API !",
+                    "documentation": "/api/docs"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Retourner un message de bienvenue",
+        "tags": ["Application"]
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connexion réussie",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Connexion réussie.",
+                    "data": {
+                      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                      "user": {
+                        "nom": "Dupont",
+                        "prenom": "Marie",
+                        "email": "marie@example.com",
+                        "role": "ASSISTANTE_MATERNELLE"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données de connexion invalides"
+          },
+          "404": {
+            "description": "Utilisateur inexistant"
+          },
+          "409": {
+            "description": "Email ou mot de passe incorrect"
+          }
+        },
+        "summary": "Connexion utilisateur",
+        "tags": ["Authentification"]
+      }
+    },
+    "/api/auth/register/parent": {
+      "post": {
+        "operationId": "AuthController_registerParent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateParentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Parent créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Parent créé avec succès",
+                    "data": {
+                      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                      "user": {
+                        "id": 1,
+                        "nom": "Dupont",
+                        "prenom": "Jean",
+                        "email": "jean@example.com",
+                        "role": "PARENT",
+                        "message": "Profil parent créé avec succès"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "409": {
+            "description": "Un utilisateur avec cet email existe déjà"
+          }
+        },
+        "summary": "Enregistrement d'un nouveau parent",
+        "tags": ["Authentification"]
+      }
+    },
+    "/api/auth/register/assistante": {
+      "post": {
+        "operationId": "AuthController_registerAssistante",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAssistanteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Assistante créée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Assistante créée avec succès",
+                    "data": {
+                      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                      "user": {
+                        "id": 1,
+                        "nom": "Martin",
+                        "prenom": "Sophie",
+                        "email": "sophie@example.com",
+                        "role": "ASSISTANTE_MATERNELLE",
+                        "message": "Profil assistante créé avec succès"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "409": {
+            "description": "Un utilisateur avec cet email existe déjà"
+          }
+        },
+        "summary": "Enregistrement d'une nouvelle assistante maternelle",
+        "tags": ["Authentification"]
+      }
+    },
+    "/api/parent": {
+      "get": {
+        "operationId": "ParentController_fetchProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Profil parent récupéré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": 1,
+                    "nom": "Dupont",
+                    "prenom": "Jean",
+                    "telephone": "0612345678",
+                    "email": "jean@example.com",
+                    "role": "PARENT",
+                    "parentProfil": {
+                      "utilisateurId": 1,
+                      "adresse": "123 Rue de la Paix",
+                      "codePostal": "75000",
+                      "ville": "Paris",
+                      "liensEnfants": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès réservé aux parents"
+          },
+          "404": {
+            "description": "Profil parent non trouvé"
+          }
+        },
+        "summary": "Récupérer le profil du parent connecté",
+        "tags": ["Parent"]
+      },
+      "put": {
+        "operationId": "ParentController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateParentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profil parent mis à jour avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Profil parent mis à jour avec succès"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès réservé aux parents"
+          },
+          "404": {
+            "description": "Parent non trouvé"
+          }
+        },
+        "summary": "Mettre à jour le profil du parent",
+        "tags": ["Parent"]
+      }
+    },
+    "/api/parent/tous": {
+      "get": {
+        "operationId": "ParentController_findAllParents",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste des parents récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "nom": "Dupont",
+                      "prenom": "Jean",
+                      "email": "jean@example.com",
+                      "telephone": "0612345678",
+                      "role": "PARENT",
+                      "parentProfil": {
+                        "adresse": "123 Rue de la Paix",
+                        "ville": "Paris"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès réservé aux administrateurs"
+          }
+        },
+        "summary": "Récupérer tous les parents (Admin uniquement)",
+        "tags": ["Parent"]
+      }
+    },
+    "/api/assistante": {
+      "get": {
+        "operationId": "AssistanteController_fetchProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Profil assistante récupéré avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": 1,
+                    "nom": "Dupont",
+                    "prenom": "Marie",
+                    "telephone": "0612345678",
+                    "email": "marie@example.com",
+                    "role": "ASSISTANTE_MATERNELLE",
+                    "assistanteProfil": {
+                      "utilisateurId": 1,
+                      "numeroAgrement": "AG123456",
+                      "dateObtentionAgrement": "2020-01-15",
+                      "agrementValide": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès réservé aux assistantes"
+          },
+          "404": {
+            "description": "Assistante non trouvée"
+          }
+        },
+        "summary": "Récupérer le profil de l'assistante connectée",
+        "tags": ["Assistante"]
+      },
+      "put": {
+        "operationId": "AssistanteController_updateProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAssistanteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profil assistante mis à jour avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Profil assistante mis à jour avec succès"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Accès réservé aux assistantes"
+          },
+          "404": {
+            "description": "Assistante non trouvée"
+          }
+        },
+        "summary": "Mettre à jour le profil de l'assistante",
+        "tags": ["Assistante"]
+      }
+    },
+    "/api/assistante/toutes": {
+      "get": {
+        "operationId": "AssistanteController_findAllAssistantes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste des assistantes récupérée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "nom": "Dupont",
+                      "prenom": "Marie",
+                      "email": "marie@example.com",
+                      "telephone": "0612345678",
+                      "assistanteProfil": {
+                        "numeroAgrement": "AG123456",
+                        "agrementValide": true,
+                        "capaciteAccueil": 4,
+                        "ville": "Boulogne-sur-Mer",
+                        "disponibilites": "Lundi-Vendredi 7h-18h"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          }
+        },
+        "summary": "Récupérer toutes les assistantes maternelles disponibles",
+        "tags": ["Assistante"]
+      }
+    },
+    "/api/enfant": {
+      "post": {
+        "operationId": "EnfantController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEnfantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Enfant créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Enfant créé avec succès",
+                    "id": 1,
+                    "nom": "Dupont",
+                    "prenom": "Emma",
+                    "dateNaissance": "2020-05-15T00:00:00.000Z",
+                    "sexe": "FILLE",
+                    "allergies": "Arachides",
+                    "remarquesMedicales": null,
+                    "medecinTraitant": null,
+                    "medecinTraitantTel": null,
+                    "createdAt": "2025-12-30T12:00:00.000Z",
+                    "updatedAt": "2025-12-30T12:00:00.000Z",
+                    "liensParents": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Les assistantes maternelles ne peuvent pas créer d'enfants"
+          }
+        },
+        "summary": "Créer un nouvel enfant",
+        "tags": ["Enfant"]
+      },
+      "get": {
+        "operationId": "EnfantController_findAll",
+        "parameters": [
+          {
+            "name": "parentId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par ID du parent",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enfants récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "nom": "Dupont",
+                      "prenom": "Emma",
+                      "dateNaissance": "2020-05-15T00:00:00.000Z",
+                      "sexe": "FILLE",
+                      "allergies": "Arachides",
+                      "remarquesMedicales": null,
+                      "medecinTraitant": null,
+                      "medecinTraitantTel": null,
+                      "createdAt": "2025-12-30T12:00:00.000Z",
+                      "updatedAt": "2025-12-30T12:00:00.000Z",
+                      "liensParents": []
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          }
+        },
+        "summary": "Récupérer les enfants (avec filtre optionnel par parentId)",
+        "tags": ["Enfant"]
+      }
+    },
+    "/api/enfant/mes-enfants": {
+      "get": {
+        "operationId": "EnfantController_findMyChildren",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Enfants du parent connecté récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "nom": "Dupont",
+                      "prenom": "Emma",
+                      "dateNaissance": "2020-05-15T00:00:00.000Z",
+                      "sexe": "FILLE",
+                      "liensParents": []
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          }
+        },
+        "summary": "Récupérer les enfants du parent connecté",
+        "tags": ["Enfant"]
+      }
+    },
+    "/api/enfant/{id}": {
+      "get": {
+        "operationId": "EnfantController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails de l'enfant récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": 1,
+                    "nom": "Dupont",
+                    "prenom": "Emma",
+                    "dateNaissance": "2020-05-15T00:00:00.000Z",
+                    "sexe": "FILLE",
+                    "allergies": "Arachides",
+                    "remarquesMedicales": null,
+                    "medecinTraitant": null,
+                    "medecinTraitantTel": null,
+                    "createdAt": "2025-12-30T12:00:00.000Z",
+                    "updatedAt": "2025-12-30T12:00:00.000Z",
+                    "liensParents": [],
+                    "personnesAutorisees": [],
+                    "contratsGarde": [],
+                    "inscriptionsAtelier": [],
+                    "inscriptionCreche": null,
+                    "reservationsCreche": [],
+                    "suivisJournalier": []
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Enfant non trouvé"
+          }
+        },
+        "summary": "Récupérer les détails d'un enfant",
+        "tags": ["Enfant"]
+      },
+      "put": {
+        "operationId": "EnfantController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateEnfantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Enfant mis à jour avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Enfant mis à jour avec succès",
+                    "id": 1,
+                    "nom": "Dupont",
+                    "prenom": "Emma",
+                    "dateNaissance": "2020-05-15T00:00:00.000Z",
+                    "sexe": "FILLE",
+                    "allergies": "Arachides, Noix",
+                    "remarquesMedicales": null,
+                    "medecinTraitant": null,
+                    "medecinTraitantTel": null,
+                    "createdAt": "2025-12-30T12:00:00.000Z",
+                    "updatedAt": "2025-12-30T15:30:00.000Z",
+                    "liensParents": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Enfant non trouvé"
+          }
+        },
+        "summary": "Mettre à jour un enfant",
+        "tags": ["Enfant"]
+      },
+      "delete": {
+        "operationId": "EnfantController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Enfant supprimé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Enfant supprimé avec succès"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Enfant non trouvé"
+          }
+        },
+        "summary": "Supprimer un enfant",
+        "tags": ["Enfant"]
+      }
+    },
+    "/api/personne-autorisee": {
+      "post": {
+        "operationId": "PersonneAutoriseeController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePersonneAutoriseeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Personne autorisée créée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Personne autorisée créée avec succès",
+                    "id": 1,
+                    "enfantId": 1,
+                    "nom": "Dupont",
+                    "prenom": "Marie",
+                    "telephone": "0612345678",
+                    "lienAvecEnfant": "Grand-mère",
+                    "autorisationEcrite": true,
+                    "createdAt": "2025-12-30T12:00:00.000Z",
+                    "updatedAt": "2025-12-30T12:00:00.000Z",
+                    "enfant": {
+                      "id": 1,
+                      "nom": "Dupont",
+                      "prenom": "Emma"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Enfant non trouvé"
+          }
+        },
+        "summary": "Créer une nouvelle personne autorisée",
+        "tags": ["Personne Autorisée"]
+      },
+      "get": {
+        "operationId": "PersonneAutoriseeController_findAll",
+        "parameters": [
+          {
+            "name": "enfantId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par ID de l'enfant",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personnes autorisées récupérées avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "enfantId": 1,
+                      "nom": "Dupont",
+                      "prenom": "Marie",
+                      "telephone": "0612345678",
+                      "lienAvecEnfant": "Grand-mère",
+                      "autorisationEcrite": true,
+                      "createdAt": "2025-12-30T12:00:00.000Z",
+                      "updatedAt": "2025-12-30T12:00:00.000Z",
+                      "enfant": {
+                        "id": 1,
+                        "nom": "Dupont",
+                        "prenom": "Emma"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          }
+        },
+        "summary": "Récupérer les personnes autorisées",
+        "tags": ["Personne Autorisée"]
+      }
+    },
+    "/api/personne-autorisee/{id}": {
+      "get": {
+        "operationId": "PersonneAutoriseeController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails de la personne autorisée récupérés avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": 1,
+                    "enfantId": 1,
+                    "nom": "Dupont",
+                    "prenom": "Marie",
+                    "telephone": "0612345678",
+                    "lienAvecEnfant": "Grand-mère",
+                    "autorisationEcrite": true,
+                    "createdAt": "2025-12-30T12:00:00.000Z",
+                    "updatedAt": "2025-12-30T12:00:00.000Z",
+                    "enfant": {
+                      "id": 1,
+                      "nom": "Dupont",
+                      "prenom": "Emma"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Personne autorisée non trouvée"
+          }
+        },
+        "summary": "Récupérer les détails d'une personne autorisée",
+        "tags": ["Personne Autorisée"]
+      },
+      "put": {
+        "operationId": "PersonneAutoriseeController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePersonneAutoriseeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Personne autorisée mise à jour avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Personne autorisée mise à jour avec succès",
+                    "id": 1,
+                    "enfantId": 1,
+                    "nom": "Dupont",
+                    "prenom": "Marie",
+                    "telephone": "0612345679",
+                    "lienAvecEnfant": "Grand-mère",
+                    "autorisationEcrite": true,
+                    "createdAt": "2025-12-30T12:00:00.000Z",
+                    "updatedAt": "2025-12-30T15:30:00.000Z",
+                    "enfant": {
+                      "id": 1,
+                      "nom": "Dupont",
+                      "prenom": "Emma"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Personne autorisée non trouvée"
+          }
+        },
+        "summary": "Mettre à jour une personne autorisée",
+        "tags": ["Personne Autorisée"]
+      },
+      "delete": {
+        "operationId": "PersonneAutoriseeController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Personne autorisée supprimée avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Personne autorisée supprimée avec succès"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Personne autorisée non trouvée"
+          }
+        },
+        "summary": "Supprimer une personne autorisée",
+        "tags": ["Personne Autorisée"]
+      }
+    },
+    "/api/lien-parent-enfant/lien": {
+      "post": {
+        "operationId": "LienParentEnfantController_createLien",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLienParentEnfantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Lien parent-enfant créé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Lien parent-enfant créé avec succès",
+                    "id": 1,
+                    "parentId": 1,
+                    "enfantId": 1,
+                    "estResponsableLegal": true,
+                    "parent": {
+                      "id": 1,
+                      "nom": "Martin",
+                      "prenom": "Sophie"
+                    },
+                    "enfant": {
+                      "id": 1,
+                      "nom": "Martin",
+                      "prenom": "Lucas"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "403": {
+            "description": "Les assistantes maternelles ne peuvent pas créer de liens parent-enfant"
+          },
+          "404": {
+            "description": "Parent ou enfant non trouvé"
+          },
+          "409": {
+            "description": "Un lien existe déjà entre ce parent et cet enfant"
+          }
+        },
+        "summary": "Créer un lien entre un parent et un enfant",
+        "tags": ["Lien parent-enfant"]
+      },
+      "get": {
+        "operationId": "LienParentEnfantController_findAllLiens",
+        "parameters": [
+          {
+            "name": "enfantId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par enfant",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "parentId",
+            "required": false,
+            "in": "query",
+            "description": "Filtrer par parent",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liste des liens parent-enfant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": [
+                    {
+                      "id": 1,
+                      "parentId": 1,
+                      "enfantId": 1,
+                      "estResponsableLegal": true,
+                      "parent": {
+                        "id": 1,
+                        "nom": "Martin",
+                        "prenom": "Sophie"
+                      },
+                      "enfant": {
+                        "id": 1,
+                        "nom": "Martin",
+                        "prenom": "Lucas"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          }
+        },
+        "summary": "Récupérer tous les liens parent-enfant",
+        "tags": ["Lien parent-enfant"]
+      }
+    },
+    "/api/lien-parent-enfant/lien/{id}": {
+      "get": {
+        "operationId": "LienParentEnfantController_findOneLien",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Détails du lien parent-enfant",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "id": 1,
+                    "parentId": 1,
+                    "enfantId": 1,
+                    "estResponsableLegal": true,
+                    "parent": {
+                      "id": 1,
+                      "nom": "Martin",
+                      "prenom": "Sophie"
+                    },
+                    "enfant": {
+                      "id": 1,
+                      "nom": "Martin",
+                      "prenom": "Lucas"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Lien parent-enfant non trouvé"
+          }
+        },
+        "summary": "Récupérer un lien parent-enfant par son ID",
+        "tags": ["Lien parent-enfant"]
+      },
+      "put": {
+        "operationId": "LienParentEnfantController_updateLien",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLienParentEnfantDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Lien parent-enfant mis à jour avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Lien parent-enfant mis à jour avec succès",
+                    "id": 1,
+                    "parentId": 1,
+                    "enfantId": 1,
+                    "estResponsableLegal": false,
+                    "parent": {
+                      "id": 1,
+                      "nom": "Martin",
+                      "prenom": "Sophie"
+                    },
+                    "enfant": {
+                      "id": 1,
+                      "nom": "Martin",
+                      "prenom": "Lucas"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Données invalides"
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Lien parent-enfant non trouvé"
+          }
+        },
+        "summary": "Modifier un lien parent-enfant",
+        "tags": ["Lien parent-enfant"]
+      },
+      "delete": {
+        "operationId": "LienParentEnfantController_removeLien",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lien parent-enfant supprimé avec succès",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "message": "Lien parent-enfant supprimé avec succès"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentification requise"
+          },
+          "404": {
+            "description": "Lien parent-enfant non trouvé"
+          }
+        },
+        "summary": "Supprimer un lien parent-enfant",
+        "tags": ["Lien parent-enfant"]
+      }
+    }
+  },
+  "info": {
+    "title": "Fripouilles API",
+    "description": "API du projet d'AP - Les Fripouilles",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "schemas": {
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "L'adresse email de l'utilisateur"
+          },
+          "password": {
+            "type": "string",
+            "example": "StrongP@ssw0rd!",
+            "description": "Le mot de passe de l'utilisateur (min. 12 caractères, 1 chiffre, 1 symbole)"
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "CreateParentDto": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "example": "Doe",
+            "description": "Le nom de l'utilisateur"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "John",
+            "description": "Le prénom de l'utilisateur"
+          },
+          "telephone": {
+            "type": "string",
+            "example": "06 12 34 56 78",
+            "description": "Le numéro de téléphone de l'utilisateur"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "L'email de l'utilisateur"
+          },
+          "password": {
+            "type": "string",
+            "example": "P@ssw0rd!23",
+            "description": "Le mot de passe de l'utilisateur"
+          },
+          "role": {
+            "type": "string",
+            "example": "PARENT",
+            "description": "Le rôle de l'utilisateur"
+          },
+          "adresse": {
+            "type": "string",
+            "example": "123 Avenue des Champs",
+            "description": "L'adresse du parent"
+          },
+          "codePostal": {
+            "type": "string",
+            "example": "75000",
+            "description": "Le code postal du parent"
+          },
+          "ville": {
+            "type": "string",
+            "example": "Paris",
+            "description": "La ville du parent"
+          },
+          "situationFamiliale": {
+            "type": "string",
+            "example": "Célibataire",
+            "description": "La situation familiale du parent"
+          },
+          "profession": {
+            "type": "string",
+            "example": "Ingénieur",
+            "description": "La profession du parent"
+          },
+          "employeur": {
+            "type": "string",
+            "example": "Entreprise XYZ",
+            "description": "L'employeur du parent"
+          },
+          "numeroAllocataire": {
+            "type": "string",
+            "example": "1234567890123",
+            "description": "Le numéro d'allocataire du parent"
+          },
+          "beneficiaireCAF": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indique si le parent est bénéficiaire de la CAF"
+          },
+          "numeroCAF": {
+            "type": "string",
+            "example": "9876543210987",
+            "description": "Le numéro CAF du parent"
+          },
+          "contactUrgenceNom": {
+            "type": "string",
+            "example": "Jean Dupont",
+            "description": "Le contact d'urgence du parent"
+          },
+          "contactUrgenceTel": {
+            "type": "string",
+            "example": "0612345678",
+            "description": "Le numéro de contact d'urgence du parent"
+          }
+        },
+        "required": [
+          "nom",
+          "prenom",
+          "telephone",
+          "email",
+          "password",
+          "role",
+          "adresse",
+          "codePostal",
+          "ville",
+          "situationFamiliale",
+          "contactUrgenceNom",
+          "contactUrgenceTel"
+        ]
+      },
+      "CreateAssistanteDto": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "example": "Doe",
+            "description": "Le nom de l'utilisateur"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "John",
+            "description": "Le prénom de l'utilisateur"
+          },
+          "telephone": {
+            "type": "string",
+            "example": "06 12 34 56 78",
+            "description": "Le numéro de téléphone de l'utilisateur"
+          },
+          "email": {
+            "type": "string",
+            "example": "john.doe@example.com",
+            "description": "L'email de l'utilisateur"
+          },
+          "password": {
+            "type": "string",
+            "example": "P@ssw0rd!23",
+            "description": "Le mot de passe de l'utilisateur"
+          },
+          "role": {
+            "type": "string",
+            "example": "PARENT",
+            "description": "Le rôle de l'utilisateur"
+          },
+          "numeroAgrement": {
+            "type": "string",
+            "example": "AG123456",
+            "description": "Le numéro d'agrément de l'assistante maternelle"
+          },
+          "dateObtentionAgrement": {
+            "type": "string",
+            "example": "2020-01-01",
+            "description": "La date d'obtention de l'agrément"
+          },
+          "agrementValide": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indique si l'agrément est valide"
+          },
+          "dateFinAgrement": {
+            "type": "string",
+            "example": "2025-01-01",
+            "description": "La date de fin de l'agrément"
+          },
+          "capaciteAccueil": {
+            "type": "number",
+            "example": 4,
+            "description": "La capacité d'accueil de l'assistante maternelle"
+          },
+          "adresse": {
+            "type": "string",
+            "example": "123 Rue de la Paix",
+            "description": "L'adresse de l'assistante maternelle"
+          },
+          "codePostal": {
+            "type": "string",
+            "example": "75000",
+            "description": "Le code postal de l'assistante maternelle"
+          },
+          "ville": {
+            "type": "string",
+            "example": "Paris",
+            "description": "La ville de l'assistante maternelle"
+          },
+          "experience": {
+            "type": "number",
+            "example": 5,
+            "description": "L'expérience en années de l'assistante maternelle"
+          },
+          "disponibilites": {
+            "type": "string",
+            "example": "Lundi au Vendredi de 8h à 18h",
+            "description": "Les disponibilités de l'assistante maternelle"
+          }
+        },
+        "required": [
+          "nom",
+          "prenom",
+          "telephone",
+          "email",
+          "password",
+          "role",
+          "numeroAgrement",
+          "dateObtentionAgrement",
+          "agrementValide",
+          "capaciteAccueil",
+          "adresse",
+          "codePostal",
+          "ville",
+          "experience",
+          "disponibilites"
+        ]
+      },
+      "UpdateParentDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateAssistanteDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateEnfantDto": {
+        "type": "object",
+        "properties": {
+          "nom": {
+            "type": "string",
+            "example": "Dupont",
+            "description": "Le nom de l'enfant"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Emma",
+            "description": "Le prénom de l'enfant"
+          },
+          "dateNaissance": {
+            "type": "string",
+            "example": "2020-05-15",
+            "description": "La date de naissance de l'enfant (format ISO)"
+          },
+          "sexe": {
+            "type": "string",
+            "example": "FILLE",
+            "description": "Le sexe de l'enfant (GARCON ou FILLE)"
+          },
+          "allergies": {
+            "type": "string",
+            "example": "Arachides, Noix",
+            "description": "Les allergies de l'enfant"
+          },
+          "remarquesMedicales": {
+            "type": "string",
+            "example": "Asthme léger",
+            "description": "Les remarques médicales concernant l'enfant"
+          },
+          "medecinTraitant": {
+            "type": "string",
+            "example": "Dr. Martin",
+            "description": "Le nom du médecin traitant"
+          },
+          "medecinTraitantTel": {
+            "type": "string",
+            "example": "0612345678",
+            "description": "Le numéro de téléphone du médecin traitant"
+          }
+        },
+        "required": ["nom", "prenom", "dateNaissance", "sexe"]
+      },
+      "UpdateEnfantDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreatePersonneAutoriseeDto": {
+        "type": "object",
+        "properties": {
+          "enfantId": {
+            "type": "number",
+            "example": 1,
+            "description": "L'ID de l'enfant"
+          },
+          "nom": {
+            "type": "string",
+            "example": "Dupont",
+            "description": "Le nom de la personne autorisée"
+          },
+          "prenom": {
+            "type": "string",
+            "example": "Marie",
+            "description": "Le prénom de la personne autorisée"
+          },
+          "telephone": {
+            "type": "string",
+            "example": "0612345678",
+            "description": "Le numéro de téléphone de la personne autorisée"
+          },
+          "lienAvecEnfant": {
+            "type": "string",
+            "example": "Grand-mère",
+            "description": "Le lien avec l'enfant"
+          },
+          "autorisationEcrite": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indique si l'autorisation écrite est fournie"
+          }
+        },
+        "required": ["enfantId", "nom", "prenom", "telephone", "lienAvecEnfant"]
+      },
+      "UpdatePersonneAutoriseeDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateLienParentEnfantDto": {
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "type": "number",
+            "example": 1,
+            "description": "L'ID du parent"
+          },
+          "enfantId": {
+            "type": "number",
+            "example": 1,
+            "description": "L'ID de l'enfant"
+          },
+          "estResponsableLegal": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indique si le parent est responsable légal"
+          }
+        },
+        "required": ["parentId", "enfantId"]
+      },
+      "UpdateLienParentEnfantDto": {
+        "type": "object",
+        "properties": {
+          "parentId": {
+            "type": "number",
+            "example": 1,
+            "description": "L'ID du parent"
+          },
+          "enfantId": {
+            "type": "number",
+            "example": 1,
+            "description": "L'ID de l'enfant"
+          },
+          "estResponsableLegal": {
+            "type": "boolean",
+            "example": true,
+            "description": "Indique si le parent est responsable légal"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearer": []
+    }
+  ]
+}
