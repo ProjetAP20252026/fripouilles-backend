@@ -103,10 +103,31 @@ export class AssistanteService {
             throw new NotFoundException('Assistante non trouvée');
         }
 
+        // Mettre à jour les informations utilisateur
+        await this.prisma.utilisateur.update({
+            where: { id: userId },
+            data: {
+                nom: updateAssistanteDto.nom,
+                prenom: updateAssistanteDto.prenom,
+                telephone: updateAssistanteDto.telephone,
+                email: updateAssistanteDto.email,
+            }
+        });
+
+        // Mettre à jour le profil assistante
         await this.prisma.assistanteProfil.update({
             where: { utilisateurId: userId },
             data: {
-                ...updateAssistanteDto,
+                numeroAgrement: updateAssistanteDto.numeroAgrement,
+                dateObtentionAgrement: updateAssistanteDto.dateObtentionAgrement,
+                agrementValide: updateAssistanteDto.agrementValide,
+                dateFinAgrement: updateAssistanteDto.dateFinAgrement,
+                capaciteAccueil: updateAssistanteDto.capaciteAccueil,
+                adresse: updateAssistanteDto.adresse,
+                codePostal: updateAssistanteDto.codePostal,
+                ville: updateAssistanteDto.ville,
+                experience: updateAssistanteDto.experience,
+                disponibilites: updateAssistanteDto.disponibilites,
             }
         });
 

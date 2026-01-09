@@ -98,6 +98,18 @@ export class ParentService {
             throw new NotFoundException('Parent non trouvé');
         };
 
+        // Mettre à jour les informations utilisateur
+        await this.prisma.utilisateur.update({
+            where: { id: userId },
+            data: {
+                nom: updateParentDto.nom,
+                prenom: updateParentDto.prenom,
+                telephone: updateParentDto.telephone,
+                email: updateParentDto.email,
+            }
+        });
+
+        // Mettre à jour le profil parent
         const parent = await this.prisma.parentProfil.update({
             where: { utilisateurId: userId },
             data: {

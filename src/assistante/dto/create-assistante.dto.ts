@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { CreateUserDto } from '../../user/dto/create-user.dto';
 
 export class CreateAssistanteDto extends CreateUserDto {
@@ -19,6 +19,7 @@ export class CreateAssistanteDto extends CreateUserDto {
     readonly agrementValide: boolean;
 
     @ApiProperty({ example: '2025-01-01', description: "La date de fin de l'agrément", required: false })
+    @IsOptional()
     @IsDateString({}, { message: "La date de fin d'agrément doit être une date valide (format ISO)" })
     readonly dateFinAgrement?: string;
 

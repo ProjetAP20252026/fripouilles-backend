@@ -12,9 +12,10 @@ import { LienParentEnfantModule } from './lien-parent-enfant/lien-parent-enfant.
 
 @Module({
   imports: [
-    ConfigModule.forRoot(
-      { isGlobal: true }
-    ),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     AuthModule,
     ParentModule,
     AssistanteModule,
