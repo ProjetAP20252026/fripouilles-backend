@@ -43,7 +43,7 @@ export class AuthService {
         }
 
         const accessToken = await this.jwtService.signAsync({
-            sub: user.id,
+            userId: user.id,
             email: user.email,
             role: user.role
         });
@@ -82,7 +82,7 @@ export class AuthService {
         const newParent = await this.parentService.createProfil(createParentDto, password);
 
         const accessToken = await this.jwtService.signAsync({
-            sub: newParent.id,
+            userId: newParent.id,
             email: newParent.email,
             role: newParent.role
         });

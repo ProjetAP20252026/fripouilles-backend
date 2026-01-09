@@ -1,15 +1,20 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiForbiddenResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Role } from 'generated/prisma/enums';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RoleGuard } from 'src/auth/guards/role.guard';
+import { ParseOptionalIntPipe } from 'src/common/pipes/parse-optional-int.pipe';
+import { User } from 'src/decorators/user.decorator';
 import { CreateEnfantDto } from './dto/create-enfant.dto';
 import { UpdateEnfantDto } from './dto/update-enfant.dto';
 import { EnfantService } from './enfant.service';
 
+@ApiTags('Enfant')
 @Controller('enfant')
 export class EnfantController {
     constructor(private readonly enfantService: EnfantService) { }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RoleGuard(Role.PARENT, Role.ADMIN))
     @Post()
     @ApiOperation({ summary: 'Créer un nouvel enfant' })
     @ApiCreatedResponse({
@@ -33,6 +38,7 @@ export class EnfantController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    @ApiForbiddenResponse({ description: 'Les assistantes maternelles ne peuvent pas créer d\'enfants' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
     async create(@Body() createEnfantDto: CreateEnfantDto) {
         return this.enfantService.create(createEnfantDto);
@@ -40,7 +46,8 @@ export class EnfantController {
 
     @UseGuards(JwtAuthGuard)
     @Get()
-    @ApiOperation({ summary: 'Récupérer les enfants' })
+    @ApiOperation({ summary: 'Récupérer les enfants (avec filtre optionnel par parentId)' })
+    @ApiQuery({ name: 'parentId', required: false, type: Number, description: 'Filtrer par ID du parent' })
     @ApiOkResponse({
         description: 'Enfants récupérés avec succès',
         schema: {
@@ -63,8 +70,31 @@ export class EnfantController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
-    async findAll(@Query('parentId') parentId?: string) {
-        return this.enfantService.findAll(parentId ? parseInt(parentId) : undefined);
+    async findAll(@Query('parentId', ParseOptionalIntPipe) parentId?: number) {
+        return this.enfantService.findAll(parentId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('mes-enfants')
+    @ApiOperation({ summary: 'Récupérer les enfants du parent connecté' })
+    @ApiOkResponse({
+        description: 'Enfants du parent connecté récupérés avec succès',
+        schema: {
+            example: [
+                {
+                    id: 1,
+                    nom: 'Dupont',
+                    prenom: 'Emma',
+                    dateNaissance: '2020-05-15T00:00:00.000Z',
+                    sexe: 'FILLE',
+                    liensParents: []
+                }
+            ]
+        }
+    })
+    @ApiUnauthorizedResponse({ description: 'Authentification requise' })
+    async findMyChildren(@User('userId') userId: number) {
+        return this.enfantService.findByParentUserId(userId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -97,8 +127,8 @@ export class EnfantController {
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Enfant non trouvé' })
-    async findOne(@Param('id') id: string) {
-        return this.enfantService.findOne(parseInt(id));
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.enfantService.findOne(id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -127,8 +157,8 @@ export class EnfantController {
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Enfant non trouvé' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async update(@Param('id') id: string, @Body() updateEnfantDto: UpdateEnfantDto) {
-        return this.enfantService.update(parseInt(id), updateEnfantDto);
+    async update(@Param('id', ParseIntPipe) id: number, @Body() updateEnfantDto: UpdateEnfantDto) {
+        return this.enfantService.update(id, updateEnfantDto);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -142,7 +172,7 @@ export class EnfantController {
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Enfant non trouvé' })
-    async remove(@Param('id') id: string) {
-        return this.enfantService.remove(parseInt(id));
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        return this.enfantService.remove(id);
     }
 }

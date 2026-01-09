@@ -135,4 +135,36 @@ export class AssistanteService {
             message: 'Profil assistante mis à jour avec succès',
         };
     }
+
+    async findAll() {
+        const assistantes = await this.prisma.utilisateur.findMany({
+            where: { role: Role.ASSISTANTE_MATERNELLE },
+            select: {
+                id: true,
+                nom: true,
+                prenom: true,
+                email: true,
+                telephone: true,
+                role: true,
+                createdAt: true,
+                assistanteProfil: {
+                    select: {
+                        id: true,
+                        numeroAgrement: true,
+                        dateObtentionAgrement: true,
+                        agrementValide: true,
+                        dateFinAgrement: true,
+                        capaciteAccueil: true,
+                        adresse: true,
+                        codePostal: true,
+                        ville: true,
+                        experience: true,
+                        disponibilites: true
+                    }
+                }
+            }
+        });
+
+        return assistantes;
+    }
 }

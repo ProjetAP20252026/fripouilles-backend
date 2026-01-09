@@ -7,16 +7,10 @@ import { Pool } from 'pg';
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
     constructor(configService: ConfigService) {
-        const databaseUrl = configService.get<string>('DATABASE_URL');
-        console.log('=== DATABASE_URL FROM ConfigService ===', databaseUrl);
-        
-        const pool = new Pool({
-            connectionString: databaseUrl
-        });
-        
-        const adapter = new PrismaPg(pool);
-        
-        super({ adapter });
+        const adapter = new PrismaPg({
+            url: configService.get<string>('DATABASE_URL')
+        })
+        super({ adapter })
     }
 
     async onModuleInit() {

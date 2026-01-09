@@ -31,6 +31,9 @@ CREATE TYPE "TypeSieste" AS ENUM ('MATIN', 'APRES_MIDI', 'MATIN_ET_APRES_MIDI', 
 -- CreateEnum
 CREATE TYPE "TypeActionModification" AS ENUM ('AJOUT', 'MODIFICATION', 'SUPPRESSION');
 
+-- CreateEnum
+CREATE TYPE "OriginHistorique" AS ENUM ('SUIVI_JOURNALIER', 'CONTRAT_GARDE');
+
 -- CreateTable
 CREATE TABLE "utilisateur" (
     "id" SERIAL NOT NULL,
@@ -222,6 +225,7 @@ CREATE TABLE "historique_modification" (
     "parentId" INTEGER NOT NULL,
     "suiviId" INTEGER NOT NULL,
     "dateAction" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "origine" "OriginHistorique" NOT NULL,
     "commentaire" TEXT,
     "typeAction" "TypeActionModification" NOT NULL,
 

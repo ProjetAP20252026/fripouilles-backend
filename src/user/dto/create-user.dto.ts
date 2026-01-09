@@ -28,12 +28,12 @@ export class CreateUserDto {
     @IsNotEmpty({ message: 'Le mot de passe est obligatoire' })
     @IsString({ message: 'Le mot de passe doit être une chaîne de caractères' })
     @IsStrongPassword({
-        minLength: 12,
+        minLength: 10,
         minUppercase: 1,
         minNumbers: 1,
         minSymbols: 1,
     }, {
-        message: 'Le mot de passe doit contenir au moins 12 caractères, une lettre majuscule, un chiffre et un symbole'
+        message: 'Le mot de passe doit contenir au moins 10 caractères, une lettre majuscule, un chiffre et un symbole'
     })
     readonly password: string;
 

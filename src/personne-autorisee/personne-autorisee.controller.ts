@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { ParseOptionalIntPipe } from 'src/common/pipes/parse-optional-int.pipe';
 import { CreatePersonneAutoriseeDto } from './dto/create-personne-autorisee.dto';
 import { UpdatePersonneAutoriseeDto } from './dto/update-personne-autorisee.dto';
 import { PersonneAutoriseeService } from './personne-autorisee.service';
@@ -45,6 +46,7 @@ export class PersonneAutoriseeController {
     @UseGuards(JwtAuthGuard)
     @Get()
     @ApiOperation({ summary: 'Récupérer les personnes autorisées' })
+    @ApiQuery({ name: 'enfantId', required: false, type: Number, description: 'Filtrer par ID de l\'enfant' })
     @ApiOkResponse({
         description: 'Personnes autorisées récupérées avec succès',
         schema: {
@@ -69,8 +71,8 @@ export class PersonneAutoriseeController {
         }
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
-    async findAll(@Query('enfantId') enfantId?: string) {
-        return this.personneAutoriseeService.findAll(enfantId ? parseInt(enfantId) : undefined);
+    async findAll(@Query('enfantId', ParseOptionalIntPipe) enfantId?: number) {
+        return this.personneAutoriseeService.findAll(enfantId);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -99,8 +101,8 @@ export class PersonneAutoriseeController {
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Personne autorisée non trouvée' })
-    async findOne(@Param('id') id: string) {
-        return this.personneAutoriseeService.findOne(parseInt(id));
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.personneAutoriseeService.findOne(id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -131,8 +133,8 @@ export class PersonneAutoriseeController {
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Personne autorisée non trouvée' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async update(@Param('id') id: string, @Body() updatePersonneAutoriseeDto: UpdatePersonneAutoriseeDto) {
-        return this.personneAutoriseeService.update(parseInt(id), updatePersonneAutoriseeDto);
+    async update(@Param('id', ParseIntPipe) id: number, @Body() updatePersonneAutoriseeDto: UpdatePersonneAutoriseeDto) {
+        return this.personneAutoriseeService.update(id, updatePersonneAutoriseeDto);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -146,7 +148,7 @@ export class PersonneAutoriseeController {
     })
     @ApiUnauthorizedResponse({ description: 'Authentification requise' })
     @ApiNotFoundResponse({ description: 'Personne autorisée non trouvée' })
-    async remove(@Param('id') id: string) {
-        return this.personneAutoriseeService.remove(parseInt(id));
+    async remove(@Param('id', ParseIntPipe) id: number) {
+        return this.personneAutoriseeService.remove(id);
     }
 }

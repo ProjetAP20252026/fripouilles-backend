@@ -84,6 +84,11 @@ enum TypeActionModification {
   SUPPRESSION
 }
 
+enum OriginHistorique {
+  SUIVI_JOURNALIER
+  CONTRAT_GARDE
+}
+
 model Utilisateur {
   id               Int               @id @default(autoincrement())
   nom              String
@@ -304,6 +309,7 @@ model HistoriqueModification {
   suiviId     Int
   suivi       SuiviJournalierEnfant  @relation(fields: [suiviId], references: [id])
   dateAction  DateTime               @default(now())
+  origine     OriginHistorique
   commentaire String?
   typeAction  TypeActionModification
 

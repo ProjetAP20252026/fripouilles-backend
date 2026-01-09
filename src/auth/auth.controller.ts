@@ -1,5 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBody, ApiConflictResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { CreateAssistanteDto } from 'src/assistante/dto/create-assistante.dto';
 import { CreateParentDto } from 'src/parent/dto/create-parent.dto';
 import { AuthService } from './auth.service';
@@ -33,8 +34,17 @@ export class AuthController {
     @ApiNotFoundResponse({ description: 'Utilisateur inexistant' })
     @ApiConflictResponse({ description: 'Email ou mot de passe incorrect' })
     @ApiBadRequestResponse({ description: 'Données de connexion invalides' })
-    async login(@Body() loginDto: LoginDto) {
-        return this.authService.login(loginDto);
+    async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) res: Response) {
+        const result = await this.authService.login(loginDto);
+
+        res.cookie('accessToken', result.data.accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        return result;
     }
 
     @Post('register/parent')
@@ -61,8 +71,17 @@ export class AuthController {
     })
     @ApiConflictResponse({ description: 'Un utilisateur avec cet email existe déjà' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async registerParent(@Body() createParentDto: CreateParentDto) {
-        return this.authService.createParent(createParentDto);
+    async registerParent(@Body() createParentDto: CreateParentDto, @Res({ passthrough: true }) res: Response) {
+        const result = await this.authService.createParent(createParentDto);
+
+        res.cookie('accessToken', result.data.accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        return result;
     }
 
     @Post('register/assistante')
@@ -89,7 +108,16 @@ export class AuthController {
     })
     @ApiConflictResponse({ description: 'Un utilisateur avec cet email existe déjà' })
     @ApiBadRequestResponse({ description: 'Données invalides' })
-    async registerAssistante(@Body() createAssistanteDto: CreateAssistanteDto) {
-        return this.authService.createAssistante(createAssistanteDto);
+    async registerAssistante(@Body() createAssistanteDto: CreateAssistanteDto, @Res({ passthrough: true }) res: Response) {
+        const result = await this.authService.createAssistante(createAssistanteDto);
+
+        res.cookie('accessToken', result.data.accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60 * 1000,
+        });
+
+        return result;
     }
 }

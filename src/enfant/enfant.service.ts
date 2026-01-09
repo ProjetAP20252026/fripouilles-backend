@@ -71,6 +71,48 @@ export class EnfantService {
         });
     }
 
+    async findByParentUserId(userId: number) {
+        // Trouver le profil parent associé à l'utilisateur
+        const parentProfil = await this.prisma.parentProfil.findUnique({
+            where: { utilisateurId: userId }
+        });
+
+        if (!parentProfil) {
+            return [];
+        }
+
+        // Retourner les enfants liés à ce parent
+        return await this.prisma.enfant.findMany({
+            where: {
+                liensParents: {
+                    some: {
+                        parentId: parentProfil.id
+                    }
+                }
+            },
+            include: {
+                liensParents: {
+                    include: {
+                        parent: {
+                            include: {
+                                utilisateur: {
+                                    select: {
+                                        id: true,
+                                        nom: true,
+                                        prenom: true,
+                                        email: true,
+                                        telephone: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                personnesAutorisees: true
+            }
+        });
+    }
+
     async findOne(id: number) {
         const enfant = await this.prisma.enfant.findUnique({
             where: { id },
